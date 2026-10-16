@@ -4,69 +4,127 @@ const cors= require("cors");
 const app = express();
 app.use(cors());
 app.use(express.json());
-const tasks= require("./data/tasks.json") 
+let tasks= require("./data/tasks.json") 
 
 app.get('/tasks', (req, res)=> {   
 res.json(tasks);
 });
 
-app.post('/tasks', (req, res)=> {    
-console.log(req.body);
+const allowedStatus = ["todo", "in-progress", "done"];
+
+     // post
+
+app.post('/tasks', async (req, res)=> {    
+
+
+if(typeof req.body.title !=="string" || req.body.title.trim() ==="") {
+   return res.status(400).json({message: "Title must be non empty string"});
+    
+}
+
+if(!allowedStatus.includes(req.body.status)) {
+    return res.status(400).json({message: "Invalid status"});
+   
+}
+
+if(req.body.description !== undefined && typeof req.body.description !== "string") {
+   return res.status(400).json({message: "Invalid description"});
+    
+}
 const newTask = {
     id: tasks.length > 0
     ? Math.max(...tasks.map(task => task.id)) + 1 : 1,
-    title: req.body.title,
-    description: req.body.description,
+    title: req.body.title.trim(),
+    description: req.body.description || "",
     status: req.body.status
 };
 
-tasks.push(newTask);
+const updatedTasks=  [...tasks, newTask];
 
-fs.writeFileSync(
+try { 
+    await fs.promises.writeFile ( 
   "data/tasks.json",
-  JSON.stringify(tasks)
-)
-res.json(newTask);
+  JSON.stringify(updatedTasks, null, 2)
+);
+tasks= updatedTasks;
 
+res.status(201).json(newTask);
+} catch(error) {
+   console.log(error);
+
+   res.status(500).json({message: "Something went wrong. Try again"});
+}
 });
+                                   // delete
 
-app.delete('/tasks/:id', (req, res) =>{
+
+app.delete('/tasks/:id', async (req, res) =>{
     const id= Number(req.params.id);
 
     const taskIndex =tasks.findIndex(task => task.id === id);
 
     if (taskIndex === -1) {
-        res.status(404).json({message: "Task hittades inte"});
-        return;
+       return res.status(404).json({message: "Task not found"});
+        
     }
+const updatedTasks = tasks.filter(task => task.id !==id);
 
-    tasks.splice(taskIndex, 1);
-
-    fs.writeFileSync(
+try {
+  await fs.promises.writeFile ( 
         "data/tasks.json",
-        JSON.stringify(tasks)
+        JSON.stringify(updatedTasks, null, 2)
     );
-
-    res.json({message: "Task borttagen!"});
-
+    tasks= updatedTasks;
+    
+    res.json({message: "Task deleted!"});
+}
+catch(error) {
+    console.log(error);
+    
+    res.status(500).json({message: "Something went wrong. Try again"});
+}
 });
 
-app.patch('/tasks/:id', (req, res) => {
+
+
+
+// patch
+ app.patch('/tasks/:id', async (req, res) => {
     const id= Number(req.params.id);
     const task =tasks.find(task => task.id === id);
     if (!task) {
-        res.status(404).json({message: "Task hittades inte"});
-        return;
+       return res.status(404).json({message: "Task not found"});
+        
     }
-task.status =req.body.status;
 
-  fs.writeFileSync(
+    if(!allowedStatus.includes(req.body.status)) {
+    return res.status(400).json({message: "Invalid status"});
+    
+}
+try {
+    
+    const updatedTasks= tasks.map(task => {
+    if(task.id ===id) {
+        return {...task, status:req.body.status};
+    }
+    return task;
+});
+
+  await fs.promises.writeFile ( 
         "data/tasks.json",
-        JSON.stringify(tasks)
+        JSON.stringify(updatedTasks, null, 2)
     );
     
-res.json(task);
-});
+    tasks = updatedTasks;
+    res.json(updatedTasks.find(task => task.id ===id));
+
+ 
+} catch(error) {
+   console.log(error);
+
+   res.status(500).json({message: "Something went wrong. Try again"});
+}
+ });
 
 app.listen(3000, () => {
     console.log("Server running on port 3000")
