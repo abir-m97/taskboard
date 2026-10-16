@@ -12,8 +12,9 @@ return (
 <div className="task-card">
 <h3 className="task-title">{title}</h3>
 <p className="task-description">{description}</p>
-<label htmlFor={`status-${id}`}>Status</label>
-<select value={status}  onChange={(e) => onStatusChange(id, e.target.value as "todo" | "in-progress" | "done")}>
+<select value={status} id={`status-${id}`} 
+aria-label={`Status for ${title}`}
+onChange={(e) => onStatusChange(id, e.target.value as "todo" | "in-progress" | "done")}>
 
         <option value="todo">To do</option>
         <option value="in-progress">In progress</option>
