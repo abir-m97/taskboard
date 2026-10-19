@@ -1,34 +1,43 @@
  :root {
   /* colors*/
 
---color-shadow-gray: #302B32;
---color-gray: #64748B;
---color-lavender-mist: #efe9f0;
+--color-text: #302B32;
 --color-white: #FFFFFF;
---color-blue: #2563EB;
---color-dark-blue: #1D4ED8;
---color-vintage-berry:  #893f5e;
---color-muted-teal: #7fc29b;
---color-lavender: #D8CFDA;
---color-light-green: #e8f0f1;
---color-red: #B91C1c;
---dark-red: #991B1B;
---color-cerulean: #007991;
+--color-page-bg: #efe9f0;
+--color-border: #D8CFDA;
+--color-column-bg: #f5f3f5;
+
+/*buttons */
+
+--color-primary: #4F46E5;
+--color-primary-hover: #4338CA;
+--color-red:#B91C1c;
+--color-red-hover: #991B1B;
+
+
+/*status title */
+--color-todo: #007991;
+--color-progress:  #893f5e;
+--color-done: #397D59;
+
 
  /* theme */
---text-primary: var(--color-shadow-gray);
---primary-bg: var(--color-lavender-mist);
+--text-primary: var(--color-text);
+--primary-bg: var(--color-page-bg);
 --secondary-bg: var(--color-white);
---todo-header: var(--color-cerulean);
---progress-header: var(--color-vintage-berry);
---done-header: var(--color-muted-teal);
---column-bg: var(--color-light-green);
---border: var(--color-lavender);
---delete-btn: var(--color-red);
---delete-hover: var(--dark-red);
---create-btn: var(--color-blue);
---create-btn-hover: var(--color-dark-blue);
+--border: var(--color-border);
+--column-bg: var(--color-column-bg);
 
+
+--create-btn: var(--color-primary);
+--create-btn-hover: var(--color-primary-hover);
+--delete-btn: var(--color-red);
+--delete-btn-hover: var(--color-red-hover);
+
+
+--todo-header: var(--color-todo);
+--progress-header: var(--color-progress);
+--done-header: var(--color-done);
 }
 
 * {
@@ -36,13 +45,10 @@
 }
 
 .app {
-  display: flex;
-  flex-direction: column;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-  gap: 24px;
-
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 16px;
 }
 
 body {
@@ -55,18 +61,30 @@ body {
 }
 
 section {
+  display: grid;
   background-color: var(--secondary-bg);
   border: 1px solid var(--border);
-  max-width: 500px;
-  padding:24px;
   border-radius: 12px;
   text-align: left;
+  margin-bottom: 24px;
+  gap: 12px;
+  padding: 16px;
 
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
 }
 
 h1 {
   color: var(--text-primary);
-  margin-bottom: 10px;
+  margin: 0 0 24px;
+  font-size: 32px;
+  text-align: center;
+
 
 }
 
@@ -76,36 +94,32 @@ h2 {
 
 main {
   display: flex;
+  flex-direction: column;
   gap:24px;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .toggle {
-  display:flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 0;
-  background: transparent;
-  color: var(--text-primary);
+padding: 4px 8px;
+background: transparent;
+color: var(--create-btn);
+font-size: 24px;
 }
 
-.toggle h2 {
+.toggle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toggle-header h2 {
   margin: 0;
   font-size: 20px;
 
 }
 
-.toggle span {
-  font-size: 24px;
-  color:var(--create-btn);
 
-}
-
-.toggle:hover {
-  background: transparent;
-
-}
 input, textarea, select {
   width: 100%;
   padding: 10px 12px;
@@ -128,6 +142,7 @@ label {
   display: block;
   font-weight: 600;
   margin-bottom: 4px;
+  font-size: 14px;
 }
 
 
@@ -147,23 +162,13 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
-.kanban-column {
-  display: flex;
-  flex-direction: column;
-  flex:1;
-  min-width: 0;
-  border-radius: 12px;
-  padding:16px;
-  background-color: var(--column-bg);
-  font-size: 16px;
-}
-
 .create-btn {
   background-color: var(--create-btn);
   color: var(--secondary-bg);
   padding: 10px 8px;
   border-radius: 8px;
   font-weight: 600;
+  align-self: flex-start;
 }
 
 .create-btn:hover {
@@ -172,7 +177,7 @@ select:focus-visible {
 
 .delete-btn {
   background-color: var(--delete-btn);
-  color: var(--secondary-bg);
+  color: var(--color-white);
   padding: 8px 12px;
   border-radius: 6px;
   margin-bottom: 5px;
@@ -180,7 +185,18 @@ select:focus-visible {
 }
 
 .delete-btn:hover {
-  background-color: var(--delete-hover);
+  background-color: var(--delete-btn-hover);
+}
+
+.kanban-column {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  background-color: var(--column-bg);
+  border-radius: 12px;
+  padding:16px;
+  font-size: 16px;
 }
 
 .task-card {
@@ -214,6 +230,19 @@ select:focus-visible {
   background-color: var(--done-header);
 }
 
+.task-count {
+  display: inline-flex;
+  margin-left: 8px;
+  width:24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+  color: var(--text-primary);
+
+}
 .task-title {
   font-size: 18px;
   font-weight: 700;
@@ -230,23 +259,29 @@ select:focus-visible {
 
 }
 
-@media (max-width: 700px) {
+@media (min-width: 700px) {
   .app {
     padding:16px;
   }
 
   main {
-    flex-direction: column;
-    gap:16px;
+    flex-direction: row;
+    align-items: flex-start;
+    gap:24px;
   }
 
   .kanban-column {
-    width: 100%;
+    flex: 1;
+    width: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app {
+    padding: 24px;
   }
 
-  section {
-    max-width: 100%;
-  }
+ 
 }
 
 
