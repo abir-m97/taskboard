@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import type {Task } from "./types/types";
 import { TaskCard } from "./components/TaskCard";
 import "./App.css";
+import {getTasks, createTask, deleteTask, updateTask} from "./api.ts"
+
 
 function App() {
   const [tasks, setTasks] =useState<Task[]>([]);
@@ -12,14 +14,7 @@ function App() {
   const [message, setMessage] =useState<string>("");
 
   useEffect(()=> {
-  fetch("http://localhost:3000/tasks")
-  .then((response)=> {
-    if (!response.ok) {
-      throw new Error("Could not get tasks");
-    }
-    return response.json();
-  })
-
+  getTasks()
   .then((data) => setTasks(data))
 
 .catch(() => {
@@ -42,18 +37,12 @@ function App() {
   }
     setCreating(true);
     setMessage("");
+    
+    createTask({title: title.trim(),
+    description: description.trim(), 
+    status
+  })
 
-    fetch("http://localhost:3000/tasks", {
- method: "POST",
- headers: {"Content-Type": "application/json"},
- body: JSON.stringify({title: title.trim(), description: description.trim(), status}),
- })
- .then((response)=> {
-  if(!response.ok) {
-    throw new Error("Could not create task");
-  }
-  return response.json();
- })
  .then((data) => {
   setTasks((previousTasks) =>
   [...previousTasks, data]);
@@ -65,7 +54,7 @@ function App() {
   setStatus("todo");
    setIsOpen(false);
 
- })
+  })
 
  .catch(() => {
 setMessage("Could not create task. Try again.");
@@ -79,35 +68,23 @@ setMessage("Could not create task. Try again.");
 function handleDeleteTask(id: number) {
   setMessage("");
 
-    fetch(`http://localhost:3000/tasks/${id}`, {
-      method: "DELETE",
-    })
-.then((response) => {
-if (!response.ok) {
-  throw new Error("Could not delete task.");
-}
-  setTasks((previousTasks) =>
+   deleteTask(id)
+
+   .then(() => {
+    setTasks((previousTasks) =>
     previousTasks.filter(task => id !== task.id)
 );
 setMessage("Task deleted!");
-})
-
+   })
 .catch(() => {
   setMessage("Could not delete tasks. Try again.");
-})
+});
 }
 
 function handleUpdateTask(id: number, status :"todo" | "in-progress" | "done")
  { setMessage("");
-    fetch(`http://localhost:3000/tasks/${id}`, {
-    method:"PATCH",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({status})
-})
-.then(response => {
-if (!response.ok) {
-  throw new Error("Could not update task.");
-}
+    updateTask(id, status)
+.then(()=> {
   setTasks((previousTasks) =>
     previousTasks.map(task => id === task.id ? {
       ...task, status: status} :task 
@@ -122,19 +99,21 @@ if (!response.ok) {
     <div className="app">
       <header> 
       <h1>Taskboard</h1>
-      <p>Number of tasks: {tasks.length}</p>
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
       </header>
          <section>
-          <button className="toggle" onClick={ () => {setIsOpen(!isOpen)
+          <div className="toggle-header">
+          <h2>Create task</h2>
+          <button className="toggle" aria-label={isOpen ?  "Close create task form" : "open create task form"}
+          onClick={ () => {setIsOpen(!isOpen)
             setMessage("");
            } }
           aria-expanded={isOpen} aria-controls="create-task-form">
           
-      <h2>Create a task</h2>
-      <span>{isOpen ? "-" : "+"}</span>
+      <span aria-hidden="true">{isOpen ? "-" : "+"}</span>
       </button>
+      </div>
       {isOpen && (
         <form id="create-task-form" onSubmit={ (e) => {
           e.preventDefault();
@@ -160,8 +139,12 @@ if (!response.ok) {
 
       </section>
       <main>
-        <div className="kanban-column">
-          <h2 className="todo-header">To do</h2>
+        <div className="kanban-column" id="todo-column" >
+          <h2 className="todo-header">To do
+            <span className="task-count">{
+            tasks.filter((task) => task.status==="todo").length} 
+            </span>
+          </h2>
             {tasks.filter((task) => task.status === "todo").length === 0 && (
             <p>No tasks yet.</p>
           )}
@@ -179,8 +162,12 @@ if (!response.ok) {
       />
       )}
         </div>
-        <div className="kanban-column">
-          <h2 className="in-progress-header">In progress</h2>
+        <div className="kanban-column" id="progress-column">
+          <h2 className="in-progress-header">In progress 
+            <span className="task-count">{
+            tasks.filter((task) => task.status==="in-progress").length} 
+            </span>
+          </h2>
             {tasks.filter((task) => task.status === "in-progress").length === 0 && (
             <p>No tasks yet.</p>
           )}
@@ -198,8 +185,12 @@ if (!response.ok) {
 
       )}
         </div>
-        <div className="kanban-column">
-          <h2 className="done-header">Done</h2>
+        <div className="kanban-column" id="done-column">
+          <h2 className="done-header">Done
+            <span className="task-count">{
+            tasks.filter((task) => task.status==="done").length} 
+            </span>
+          </h2>
             {tasks.filter((task) => task.status === "done").length === 0 && (
             <p>No tasks yet.</p>
           )}
