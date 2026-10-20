@@ -1,3 +1,4 @@
+const path=require("path");
 const fs =require("fs");
 const express = require("express");   
 const cors= require("cors");
@@ -9,6 +10,8 @@ let tasks= require("./data/tasks.json")
 app.get('/tasks', (req, res)=> {   
 res.json(tasks);
 });
+
+const tasksFile =path.join(__dirname, "data", "tasks.json");
 
 const allowedStatus = ["todo", "in-progress", "done"];
 
@@ -43,7 +46,7 @@ const updatedTasks=  [...tasks, newTask];
 
 try { 
     await fs.promises.writeFile ( 
-  "data/tasks.json",
+  tasksFile,
   JSON.stringify(updatedTasks, null, 2)
 );
 tasks= updatedTasks;
@@ -71,7 +74,7 @@ const updatedTasks = tasks.filter(task => task.id !==id);
 
 try {
   await fs.promises.writeFile ( 
-        "data/tasks.json",
+        tasksFile,
         JSON.stringify(updatedTasks, null, 2)
     );
     tasks= updatedTasks;
@@ -111,7 +114,7 @@ try {
 });
 
   await fs.promises.writeFile ( 
-        "data/tasks.json",
+        tasksFile,
         JSON.stringify(updatedTasks, null, 2)
     );
     
@@ -126,6 +129,8 @@ try {
 }
  });
 
-app.listen(3000, () => {
-    console.log("Server running on port 3000")
+const PORT=process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });

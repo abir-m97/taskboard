@@ -1,1 +1,14 @@
-[{"id":1,"title":"skapa tasks","description":"jag vill testa","status":"todo"}]
+[
+  {
+    "id": 1,
+    "title": "testa backend",
+    "description": "",
+    "status": "todo"
+  },
+  {
+    "id": 2,
+    "title": "testa omladdning",
+    "description": "",
+    "status": "todo"
+  }
+]
