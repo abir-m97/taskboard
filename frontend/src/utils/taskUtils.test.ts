@@ -10,6 +10,6 @@ test("returns true when title has text", () => {
 });
 
 test("returns false when title only has spaces", () => {
-    expect(hasTitle("")).toBe(false);
+    expect(hasTitle("  ")).toBe(false);
 });
 

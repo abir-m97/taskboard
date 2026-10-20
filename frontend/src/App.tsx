@@ -28,6 +28,9 @@ function App() {
   const [title, setTitle] =useState<string>("");
   const [description, setDescription] =useState<string>("");
   const [status, setStatus] = useState<"todo" |"in-progress" | "done">("todo");
+  const todoTasks= tasks.filter((task) =>task.status ==="todo");
+  const inProgressTasks= tasks.filter((task) =>task.status ==="in-progress");
+  const doneTasks=tasks.filter((task) =>task.status ==="done");
 
 
   function handleCreateTask() {
@@ -77,7 +80,7 @@ function handleDeleteTask(id: number) {
 setMessage("Task deleted!");
    })
 .catch(() => {
-  setMessage("Could not delete tasks. Try again.");
+  setMessage("Could not delete task. Try again.");
 });
 }
 
@@ -102,7 +105,7 @@ function handleUpdateTask(id: number, status :"todo" | "in-progress" | "done")
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
       </header>
-         <section>
+         <section className={!isOpen ? "collapsed" : ""}>
           <div className="toggle-header">
           <h2>Create task</h2>
           <button className="toggle" aria-label={isOpen ?  "Close create task form" : "open create task form"}
@@ -142,14 +145,13 @@ function handleUpdateTask(id: number, status :"todo" | "in-progress" | "done")
         <div className="kanban-column" id="todo-column" >
           <h2 className="todo-header">To do
             <span className="task-count">{
-            tasks.filter((task) => task.status==="todo").length} 
+            todoTasks.length} 
             </span>
           </h2>
-            {tasks.filter((task) => task.status === "todo").length === 0 && (
+            {!loading && todoTasks.length === 0 && (
             <p>No tasks yet.</p>
           )}
-            {tasks.filter((task) => task.status ==="todo")
-            .map((task) =>
+            {todoTasks.map((task) =>
       <TaskCard
       key={task.id} 
       id={task.id}
@@ -164,15 +166,13 @@ function handleUpdateTask(id: number, status :"todo" | "in-progress" | "done")
         </div>
         <div className="kanban-column" id="progress-column">
           <h2 className="in-progress-header">In progress 
-            <span className="task-count">{
-            tasks.filter((task) => task.status==="in-progress").length} 
+            <span className="task-count">{inProgressTasks.length} 
             </span>
           </h2>
-            {tasks.filter((task) => task.status === "in-progress").length === 0 && (
+            {!loading && inProgressTasks.length === 0 && (
             <p>No tasks yet.</p>
           )}
-             {tasks.filter((task) => task.status ==="in-progress")
-            .map((task) =>
+          {inProgressTasks.map((task) =>
       <TaskCard
       key={task.id}
       id={task.id}
@@ -187,15 +187,13 @@ function handleUpdateTask(id: number, status :"todo" | "in-progress" | "done")
         </div>
         <div className="kanban-column" id="done-column">
           <h2 className="done-header">Done
-            <span className="task-count">{
-            tasks.filter((task) => task.status==="done").length} 
+            <span className="task-count">{doneTasks.length} 
             </span>
           </h2>
-            {tasks.filter((task) => task.status === "done").length === 0 && (
+            {!loading && doneTasks.length === 0 && (
             <p>No tasks yet.</p>
           )}
-             {tasks.filter((task) => task.status ==="done")
-            .map((task) =>
+             {doneTasks.map((task) =>
       <TaskCard
       key={task.id}
       id={task.id}

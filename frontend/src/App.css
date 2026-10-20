@@ -72,6 +72,11 @@ section {
 
 }
 
+section.collapsed {
+  padding: 8px 16px;
+  gap: 0;
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -182,6 +187,7 @@ select:focus-visible {
   border-radius: 6px;
   margin-bottom: 5px;
   cursor: pointer;
+  align-self: center;
 }
 
 .delete-btn:hover {
@@ -200,6 +206,8 @@ select:focus-visible {
 }
 
 .task-card {
+  display: flex;
+  flex-direction: column;
   background-color: var(--secondary-bg);
   border: 1px solid var(--border);
   padding: 16px;
@@ -259,7 +267,7 @@ select:focus-visible {
 
 }
 
-@media (min-width: 700px) {
+@media (min-width: 900px) {
   .app {
     padding:16px;
   }
